@@ -5,11 +5,11 @@ from django.contrib.auth.models import BaseUserManager, AbstractBaseUser
 class UserManager(BaseUserManager):
     def create_user(self, email, birth, password=None, **extra):
         user = self.model(
-            email = self.normalized_email('email'),
+            email = self.normalize_email(email),
             birth = birth,
             **extra
         )
-        user.set_password('password')
+        user.set_password(password)
         user.save(using=self._db)
 
         return user
@@ -17,7 +17,7 @@ class UserManager(BaseUserManager):
     def create_superuser(self, email, password=None, **extra):
         extra.setdefault('birth','2000-01-01')
         extra.setdefault('is_admin', True)
-        extra.setdefault('is_staff', True)
+        
 
         user = self.create_user(
             email=email,
@@ -29,7 +29,7 @@ class UserManager(BaseUserManager):
 class User(AbstractBaseUser):
     email = models.EmailField(verbose_name='email', max_length=100, unique=True)
     birth = models.DateField()
-    nickname = models.CharField(verbose_name='nickname', max_length=80, unique=True)
+    nickname = models.CharField(verbose_name='nickname', max_length=80)
     is_active = models.BooleanField(default=True)
     is_admin = models.BooleanField(default=False)
 
