@@ -37,14 +37,14 @@
     <div class="top">
         <div class="center">
             <img aria-label="로고">
-            <b>only</b>
+            <b><a href="{%url 'main'%}" style="color: rgb(90, 83, 83);text-decoration: none;">only</a></b>
         </div>
         <div class="left">
             {% if user.is_authenticated %}
                 <a href="#">프로필</a>
             {%else%}
-                <a href="#">로그인</a>
-                <a href="#">회원 가입</a>
+                <a href="#" style="text-decoration: none;">로그인</a>
+                <a href="#"style="text-decoration: none;">회원 가입</a>
             {%endif%}
         </div>
     </div>
