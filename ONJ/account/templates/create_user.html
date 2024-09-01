@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+
+{%block title%} 회원가입 {%endblock%}
+
+{%block head%} {%endblock%}
+
+{%block content%}
+
+<div>
+    <form method="post">
+        {%csrf_token%}
+        <label for="userID">ID:</label>
+        <input type="text" id="userID" name="userID"><br>
+        
+        <label for="birth">생년월일:</label>
+        <input type="date" id="birth" name="birth"><br>
+        
+        <label for="nickname">닉네임:</label>
+        <input type="text" id="nickname" name="nickname"><br>
+        
+        <label for="password">비밀번호:</label>
+        <input type="password" id="password" name="password"><br>
+        
+        <label for="password2">비밀번호 확인:</label>
+        <input type="password" id="password2" name="password2"><br>
+        <button>등록</button>
+    </form>
+
+</div>
+
+{%endblock%}

@@ -30,7 +30,7 @@
             font-size: 1.1rem;
         }
         .content{
-            margin-top: 5%;
+            margin-top: 10%;
         }
     </style>
 </head>
@@ -45,7 +45,7 @@
                 <a href="#">프로필</a>
             {%else%}
                 <a href="#" style="text-decoration: none;">로그인</a>
-                <a href="#"style="text-decoration: none;">회원 가입</a>
+                <a href="{% url 'create_user' %}"style="text-decoration: none;">회원 가입</a>
             {%endif%}
         </div>
     </div>
