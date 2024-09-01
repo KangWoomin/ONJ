@@ -15,7 +15,7 @@
 <div class="container">
 
     <div id="map" style="width:100%;height:400px;"></div>
-    
+
 </div>
 
 
@@ -25,7 +25,7 @@
   
     function getLocation(){
         if(navigator.geolocation){
-            navigator.geolocation.getCurrentPosition(showPosition,showError)
+            navigator.geolocation.getCurrentPosition(showPosition,showError,{enableHighAccuracy:true})
         }else{
             alert('Geolocation is not supported by this browser.');
         }
