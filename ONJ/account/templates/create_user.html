@@ -9,22 +9,23 @@
 <div>
     <form method="post" class="signup-form">
         {%csrf_token%}
-        <label for="userID">ID:</label>
-        <input type="text" id="userID" name="userID"><br>
+        <label for="email">email:</label>
+        <input type="email" id="email" name="email" value="{{form.email.value|default_if_none:''}}"><br>
         
         <label for="birth">생년월일:</label>
-        <input type="date" id="birth" name="birth"><br>
+        <input type="date" id="birth" name="birth" value="{{form.birth.value|default_if_none:''}}"><br>
         
         <label for="nickname">닉네임:</label>
-        <input type="text" id="nickname" name="nickname"><br>
+        <input type="text" id="nickname" name="nickname" value="{{form.nickname.value|default_if_none:''}}"><br>
         
-        <label for="password">비밀번호:</label>
-        <input type="password" id="password" name="password"><br>
+        <label for="password1">비밀번호:</label>
+        <input type="password" id="password1" name="password1" value="{{form.password1.value|default_if_none:''}}"><br>
         
         <label for="password2">비밀번호 확인:</label>
-        <input type="password" id="password2" name="password2"><br>
+        <input type="password" id="password2" name="password2" value="{{form.password2.value|default_if_none:''}}"><br>
         <button>등록</button>
     </form>
+
 
 </div>
 

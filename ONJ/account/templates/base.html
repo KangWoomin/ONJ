@@ -22,6 +22,7 @@
         <div class="right">
             {% if user.is_authenticated %}
                 <a href="#">프로필</a>
+                <a href="{% url 'logout' %}">로그아웃</a>
             {%else%}
                 <a href="{% url 'login' %}" style="text-decoration: none;">로그인</a>
                 <a href="{% url 'create_user' %}"style="text-decoration: none;">회원 가입</a>

@@ -16,7 +16,7 @@ class UserCreateForm(forms.ModelForm):
         if password1 and password2 and password1 != password2:
             raise forms.ValidationError('비밀번호가 일치 하지 않습니다. 비밀번호를 확인해주세요')
         
-        return password2
+        return self.cleaned_data
     
     def save(self, commit=True):
         user = super().save(commit=False)
