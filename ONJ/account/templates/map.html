@@ -1,5 +1,5 @@
 {%extends 'base.html' %}
-
+{% load static %}
 {%block title%}간단한 지도 표시하기{%endblock%}
 
 {%block head%}
@@ -12,7 +12,7 @@
 
 {%block content%}
 
-<div class="container">
+<div>
 
     <div id="map" style="width:100%;height:400px;"></div>
     <label for="position">위치 검색: </label>

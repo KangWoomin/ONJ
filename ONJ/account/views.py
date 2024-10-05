@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect
 from .forms import *
 # Create your views here.
 from django.http import HttpResponse
-
+from django.contrib.auth import login, logout, authenticate
 
 def main(request):
     return render(request,'main.html')
@@ -27,3 +27,16 @@ def create_user(request):
     else:
         form = UserCreateForm()
     return render(request,'create_user.html',{'form':form})
+
+def user_login(request):
+    if request.method == "POST":
+        email = request.POST.get('email')
+        password = request.POST.get('password')
+
+        user = authenticate(request, email = email, password = password)
+        if user.is_valid():
+            login(request, user)
+            return redirect('main')
+        else:
+            raise ValueError('아이디와 비밀번호가 다릅니다.')
+    return render(request, 'login.html')

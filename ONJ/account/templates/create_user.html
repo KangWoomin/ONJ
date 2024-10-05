@@ -1,13 +1,13 @@
 {% extends 'base.html' %}
-
+{% load static %}
 {%block title%} 회원가입 {%endblock%}
 
-{%block head%} {%endblock%}
+{%block head%}<link href="{% static 'css/signup.css' %}" rel="stylesheet"> {%endblock%}
 
 {%block content%}
 
 <div>
-    <form method="post">
+    <form method="post" class="signup-form">
         {%csrf_token%}
         <label for="userID">ID:</label>
         <input type="text" id="userID" name="userID"><br>
