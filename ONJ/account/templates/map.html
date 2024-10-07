@@ -3,74 +3,215 @@
 {%block title%}간단한 지도 표시하기{%endblock%}
 
 {%block head%}
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no">
-    
-    <script type="text/javascript" src="https://oapi.map.naver.com/openapi/v3/maps.js?ncpClientId={{naver}}"></script>
+    <script src="http://t1.kakaocdn.net/kakao_js_sdk/2.7.2/kakao.min.js" integrity="sha384-TiCUE00h649CAMonG018J2ujOgDKW/kVWlChEuu4jK2vxfAAD0eZxzCKakxg55G4" crossorigin="anonymous"></script>
+    <script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=2f404facbe64d4c8e7cb0a9620afd6c2"></script>
+<!--     <script type="text/javascript" src="https://oapi.map.naver.com/openapi/v3/maps.js?ncpClientId={{naver}}"></script> -->
 {%endblock%}
 
 {%block content%}
 
-<div>
-    <form>
-        
-        <div id="map" style="width:100%;height:400px;"></div>
-        <label for="position">위치 검색: </label>
-        <input type="text" id="position" name="position">
-        <button>검색</button>
-    </form>
+<div id="map" style="width:500px;height:400px;"></div>
+<form method="POST" id="map-form">
+    {% csrf_token %}
+    <label for="origin_x">출발지 경도(x) : </label>
+    <input type="text" id="origin_x" name="origin_x" value="127.11024293202674"><br>
+
+    <label for="origin_y">출발지 위도(y) : </label>
+    <input type="text" id="origin_y" name="origin_y" value="37.394348634049784"><br>
+
+    <label for="destination_x">목적지 경도 (x):</label>
+    <input type="text" id="destination_x" name="destination_x" value="127.10860518470294"><br>
+
+    <label for="destination_y">목적지 위도 (y):</label>
+    <input type="text" id="destination_y" name="destination_y" value="37.401999820065534"><br>
+
+    <button type="submit">길찾기</button>
+</form>
+
+<div id="results" style="border: 1px solid #ddd; padding: 10px; margin-top: 20px;">
+    <h3>길찾기 결과:</h3>
+    <div id="route-details"></div>
 </div>
+
+<script>
+
+    var container = document.getElementById('map');
+            var options = {
+                center: new kakao.maps.LatLng(33.450701, 126.570667),
+                level: 3
+            };
+
+            var map = new kakao.maps.Map(container, options);
+
+            map.addOverlayMapTypeId(kakao.maps.MapTypeId.TRAFFIC);    
+    
+    function getCookie(name){
+        let cookieValue = null;
+        if(document.cookie && document.cookie !==''){
+            const cookies = document.cookie.split(';');
+            for(let i=0; i<cookies.length; i++){
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length+1) === (name+'=')){
+                    cookieValue = decodeURIComponent(cookie.substring(name.length+1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+
+
+    document.getElementById('map-form').addEventListener('submit',function(event){
+        event.preventDefault();
+
+        const csrfToken = getCookie('csrftoken');
+
+        fetch("{% url 'map_view' %}", {
+            method : 'POST',
+            headers : {
+                'Content-Type':'application/json',
+                'X-CSRFToken': csrfToken,
+            },
+            body : JSON.stringify({
+                "origin":{
+                    "x":document.getElementById('origin_x').value,
+                    "y":document.getElementById('origin_y').value
+                },
+                "destination":{
+                    'x':document.getElementById('destination_x').value,
+                    'y':document.getElementById('destination_y').value
+                },
+                "waypoints":[{
+                    "name":'name0',
+                    'x':127.11341936045922,
+                    'y':37.39639094915999
+                }],
+                "priority":"RECOMMEND",
+                "car_fuel":"GASOLINE",
+                'car_hipass':false,
+                'alternatives':false,
+                'road_details':false
+            })
+        })
+        .then(response => response.json())
+        .then(data =>{
+            console.log(data);
+            if (data && data.routes && data.routes.length>0){
+                const route = data.routes[0];
+                const result_msg = route.result_msg;
+                console.log('길찾기 결과: ', result_msg);
+
+                if(route.summary){
+                    console.log("총 거리: ", route.summary.distance);
+                    console.log("예상 시간:", route.summary.duration);
+                }
+                if (route.sections && route.sections.length > 0) {
+                route.sections.forEach((section, index) => {
+                    console.log(`섹션 ${index + 1}:`);
+                    console.log("이동 거리:", section.distance);
+                    console.log("예상 시간:", section.duration);
+                });
+            }
+        }else{
+            console.error('error : 길찾기 결과가 없습니다.');
+        }
+        })
+        .catch(error => console.error("Error", error));
+    });
+
+    function displayRouteDetails(data){
+        const routeDetailsDiv = document.getElementById('route-details');
+        routeDetailsDiv.innerHTML = '';
+
+        if (data && data.routes && data.routes.length > 0){
+            const route = data.routes[0];
+            let resultHTML = `<p>트랜잭션 ID : ${data.trans_id}</p>`;
+            resultHTML += `<p>결과 : ${route.result_msg}</p>`;
+
+            if(route.summary){
+                resultHTML += `<h4>경로 요약 정보:</h4>`;
+                resultHTML += `<p>총 거리: ${route.summary.distance}m</p>`;
+                resultHTML += `<p>예상 시간: ${Math.round(route.summary.duration/60)}분</p>`;
+                resultHTML += `<p>최소 도착 시간 : ${route.summary.eta}</p>`;
+            }
+
+            if (route.sections && route.sections.length > 0){
+                route.sections.forEach((section, index)=>{
+                    resultHTML += `<h4>섹션 ${index +1}:</h4>`;
+                    resultHTML += `<p>이동 거리: ${section.distance}m</p>`;
+                    resultHTML += `<p>예상 시간: ${Math.round(section.duration/60)}분</p>`;
+
+                    if (section.nodes && section.nodes.length > 0) {
+                        resultHTML += `<ul>`;
+                        section.nodes.forEach((node, nodeIndex) => {
+                            resultHTML += `<li>노드 ${nodeIndex + 1}: 좌표(${node.x}, ${node.y}), 도로명: ${node.name}</li>`;
+                        });
+                        resultHTML += `</ul>`;
+                    }
+                });
+            }
+
+            // 결과 HTML 추가
+            routeDetailsDiv.innerHTML = resultHTML;
+        } else {
+            routeDetailsDiv.innerHTML = '<p>길찾기 결과가 없습니다.</p>';
+        }
+    }
+
+    Kakao.init('2f404facbe64d4c8e7cb0a9620afd6c2');
+    Kakao.isInitialized();
+
+</script>
 
 
 
 
 <script>
   
-    function getLocation(){
-        if(navigator.geolocation){
-            navigator.geolocation.getCurrentPosition(showPosition,showError,{enableHighAccuracy:true})
-        }else{
-            alert('Geolocation is not supported by this browser.');
-        }
-    }
+    // function getLocation(){
+    //     if(navigator.geolocation){
+    //         navigator.geolocation.getCurrentPosition(showPosition,showError,{enableHighAccuracy:true})
+    //     }else{
+    //         alert('Geolocation is not supported by this browser.');
+    //     }
+    // }
 
-    function showPosition(position){
-        var latitude = position.coords.latitude;
-        var longitude  = position.coords.longitude;
-        initMap(latitude, longitude)
-    }
-    function showError(){
-        switch(error.code){
-            case error.PERMISSION_DENIED:
-                alert('사용자가 위치 정보를 허용하지 않았습니다.');
-                break;
-            case error.POSITION_UNAVAILABLE:
-                alert('위치 정보를 사용 할 수 없습니다.');
-                break;
-            case error.TIMEOUT:
-                alert('위치 정보 요청이 시간 초과 되었습니다.');
-                break;
-            case error.UNKNOWN_ERROR:
-                alert('알 수 없는 오류가 발생 했습니다.');
-                break;
-        }
-    }
+    // function showPosition(position){
+    //     var latitude = position.coords.latitude;
+    //     var longitude  = position.coords.longitude;
+    //     initMap(latitude, longitude)
+    // }
+    // function showError(){
+    //     switch(error.code){
+    //         case error.PERMISSION_DENIED:
+    //             alert('사용자가 위치 정보를 허용하지 않았습니다.');
+    //             break;
+    //         case error.POSITION_UNAVAILABLE:
+    //             alert('위치 정보를 사용 할 수 없습니다.');
+    //             break;
+    //         case error.TIMEOUT:
+    //             alert('위치 정보 요청이 시간 초과 되었습니다.');
+    //             break;
+    //         case error.UNKNOWN_ERROR:
+    //             alert('알 수 없는 오류가 발생 했습니다.');
+    //             break;
+    //     }
+    // }
 
-    function initMap(latitude, longitude){
-        var mapOptions = {
-            center : new naver.maps.LatLng(latitude, longitude),
-            zoom : 14,
-        };
-        var map = new naver.maps.Map('map', mapOptions);
-        console.log(latitude, longitude);
-        new naver.maps.Marker({
-            position : new naver.maps.LatLng(latitude, longitude),
-            map: map
-        });
-    }
+    // function initMap(latitude, longitude){
+    //     var mapOptions = {
+    //         center : new naver.maps.LatLng(latitude, longitude),
+    //         zoom : 14,
+    //     };
+    //     var map = new naver.maps.Map('map', mapOptions);
+    //     console.log(latitude, longitude);
+    //     new naver.maps.Marker({
+    //         position : new naver.maps.LatLng(latitude, longitude),
+    //         map: map
+    //     });
+    // }
     
-    window.onload = getLocation;
+    // window.onload = getLocation;
 
     
 </script>
