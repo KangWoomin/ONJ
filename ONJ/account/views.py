@@ -14,6 +14,24 @@ def map(request):
         'naver':settings.NAVER_MAP_CLIENT_ID
     }
     return render(request,'map.html', content)
+def map_view(request):
+    if request.method == 'POST':
+        try:
+            data = json.loads(request.body)
+           
+            kakao_api_url =  "https://apis-navi.kakaomobility.com/v1/waypoints/directions"
+            headers = {
+                'Content-Type':'application/json',
+                'Authorization':f"KakaoAK fa733b63db3616a945bbaea4996a5085"
+            }
+            response = requests.post(kakao_api_url, headers=headers, json=data)
+            return JsonResponse(response.json())
+        except json.JSONDecodeError:
+            return JsonResponse({'error':'유효하지 않은 json'}, status=400)
+        except requests.RequestException as e:
+            return JsonResponse({"error": str(e)},status=500)
+    else:
+        return JsonResponse({"error":'POST방식이 아닙니다.'},status=405)
 
 
 def create_user(request):
