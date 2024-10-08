@@ -30,7 +30,9 @@
 
 <div id="results" style="border: 1px solid #ddd; padding: 10px; margin-top: 20px;">
     <h3>길찾기 결과:</h3>
-    <div id="route-details"></div>
+    <div id="route-details">
+
+    </div>
 </div>
 
 <script>
@@ -60,7 +62,7 @@
         return cookieValue;
     }
 
-
+    const data = '';
     document.getElementById('map-form').addEventListener('submit',function(event){
         event.preventDefault();
 
@@ -163,9 +165,7 @@
 
 </script>
 
-
-
-
+<!-- 
 <script>
   
     // function getLocation(){
@@ -214,5 +214,5 @@
     // window.onload = getLocation;
 
     
-</script>
+</script> -->
 {%endblock%}

@@ -1,9 +1,10 @@
 from django.shortcuts import render, redirect
 from .forms import *
 # Create your views here.
-from django.http import HttpResponse
+from django.http import HttpResponse,JsonResponse
 from django.contrib.auth import login, logout, authenticate
-
+import json
+import requests
 
 def main(request):
     return render(request,'main.html')
