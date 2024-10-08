@@ -13,7 +13,7 @@
 <div id="map" style="width:500px;height:400px;"></div>
 <form method="POST" id="map-form">
     {% csrf_token %}
-    <label for="origin_x">출발지 경도(x) : </label>
+    <!-- <label for="origin_x">출발지 경도(x) : </label>
     <input type="text" id="origin_x" name="origin_x" value="127.11024293202674"><br>
 
     <label for="origin_y">출발지 위도(y) : </label>
@@ -24,8 +24,18 @@
 
     <label for="destination_y">목적지 위도 (y):</label>
     <input type="text" id="destination_y" name="destination_y" value="37.401999820065534"><br>
+    -->
+    <label for="origin">출발지 : </label>
+    <input type="text" id="origin" name="origin">
+    <input type="hidden" id="origin_x" >
+    <input type="hidden" id="origin_y"><br>
+    
+    <label for="destination">도착지 : </label>
+    <input type="text" id="destination" name="destination">
+    <input type="hidden" id="destination_x">
+    <input type="hidden" id="destination_y">
 
-    <button type="submit">길찾기</button>
+    <button type="submit">길찾기</button> 
 </form>
 
 <div id="results" style="border: 1px solid #ddd; padding: 10px; margin-top: 20px;">
@@ -37,16 +47,70 @@
 
 <script>
 
-    var container = document.getElementById('map');
-            var options = {
-                center: new kakao.maps.LatLng(33.450701, 126.570667),
-                level: 3
-            };
+    var map, geocoder;
 
-            var map = new kakao.maps.Map(container, options);
+    function initMap(){
+        if (typeof kakao === 'undefined') {
+            console.error("Kakao 지도 SDK가 로드되지 않았습니다.");
+            return;
+        }
+        var container = document.getElementById('map');
+        var options = {
+            center : new kakao.maps.LatLng(33.450701,126.570667),
+            level : 4
+        };
+        map = new kakao.maps.Map(container, options);
+        map.addOverlayMapTypeId(kakao.maps.MapTypeId.TRAFFIC); 
+        geocoder = new kakao.maps.services.Geocoder();
+        console.log('Geocoder:', geocoder);
 
-            map.addOverlayMapTypeId(kakao.maps.MapTypeId.TRAFFIC);    
-    
+    }
+
+    window.onload = function(){
+       
+        Kakao.init('2f404facbe64d4c8e7cb0a9620afd6c2');
+        Kakao.isInitialized();
+        initMap();
+
+        
+    }
+
+    function searchAddress(){
+        var address1 = document.getElementById('origin').value;
+        geocoder.addressSearch(address1, function(result, status){
+            if(status === kakao.maps.services.Status.OK){
+                var origin_x = result[0].x;
+                var origin_y = result[0].y;
+                
+                console.log(origin_x);
+                console.log(origin_y);
+
+                document.getElementById('origin_x').value = origin_x;
+                document.getElementById('origin_y').value = origin_y;
+
+
+            }else{
+                alert('출발지 검색 실패'+status);
+            }
+        })
+        var adderss2 = document.getElementById('destination').value;
+        geocoder.addressSearch(adderss2, function(result, status){
+            if(status === kakao.maps.services.Status.OK){
+                var destination_x = result[0].x;
+                var destination_y = result[0].y;
+                console.log(destination_x);
+                console.log(destination_y);
+
+                document.getElementById('destination_x').value = destination_x;
+                document.getElementById('destination_y').value = destination_y;
+            }else{
+                alert('도착지 검색 실패'+status);
+            }
+        })     
+    }   
+
+   
+            
     function getCookie(name){
         let cookieValue = null;
         if(document.cookie && document.cookie !==''){
@@ -161,8 +225,6 @@
         }
     }
 
-    Kakao.init('2f404facbe64d4c8e7cb0a9620afd6c2');
-    Kakao.isInitialized();
 
 </script>
 
