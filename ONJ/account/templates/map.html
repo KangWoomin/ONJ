@@ -113,6 +113,7 @@
                     console.log("이동 거리:", section.distance);
                     console.log("예상 시간:", section.duration);
                 });
+                displayRouteDetails(data);
             }
         }else{
             console.error('error : 길찾기 결과가 없습니다.');
@@ -134,7 +135,7 @@
                 resultHTML += `<h4>경로 요약 정보:</h4>`;
                 resultHTML += `<p>총 거리: ${route.summary.distance}m</p>`;
                 resultHTML += `<p>예상 시간: ${Math.round(route.summary.duration/60)}분</p>`;
-                resultHTML += `<p>최소 도착 시간 : ${route.summary.eta}</p>`;
+                // resultHTML += `<p>최소 도착 시간 : ${route.summary.eta}</p>`;
             }
 
             if (route.sections && route.sections.length > 0){
