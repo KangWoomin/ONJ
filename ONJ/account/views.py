@@ -11,10 +11,8 @@ def main(request):
 
 from django.conf import settings
 def map(request):
-    content = {
-        'naver':settings.NAVER_MAP_CLIENT_ID
-    }
-    return render(request,'map.html', content)
+    
+    return render(request,'map.html')
 def map_view(request):
     if request.method == 'POST':
         try:
@@ -23,7 +21,7 @@ def map_view(request):
             kakao_api_url =  "https://apis-navi.kakaomobility.com/v1/waypoints/directions"
             headers = {
                 'Content-Type':'application/json',
-                'Authorization':f"KakaoAK fa733b63db3616a945bbaea4996a5085"
+                'Authorization':"KakaoAK fa733b63db3616a945bbaea4996a5085"
             }
             response = requests.post(kakao_api_url, headers=headers, json=data)
             return JsonResponse(response.json())
